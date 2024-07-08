@@ -12,6 +12,7 @@
         <module>demo01-template</module>
         <module>demo02-ioc</module>
         <module>demo03-bean-manage-recommend-way</module>
+        <module>demo04-config-file</module>
     </modules>
     <packaging>pom</packaging>
 
