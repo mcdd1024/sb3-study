@@ -10,6 +10,7 @@
     <description>SpringBoot3 study project</description>
     <modules>
         <module>demo01-template</module>
+        <module>demo02-ioc</module>
     </modules>
     <packaging>pom</packaging>
 
