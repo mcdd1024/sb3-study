@@ -13,6 +13,7 @@
         <module>demo02-ioc</module>
         <module>demo03-bean-manage-recommend-way</module>
         <module>demo04-config-file</module>
+        <module>demo05-dependency-injection</module>
     </modules>
     <packaging>pom</packaging>
 
