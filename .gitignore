@@ -1,3 +1,4 @@
+node_modules
 .idea
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -172,7 +173,6 @@ dist
 **/*.backup.*
 **/*.back.*
 
-node_modules
 
 *.sublime*
 
@@ -188,3 +188,4 @@ npm-debug.log
 yarn-error.log
 
 /.fastRequest/
+/docs/.vitepress/cache/

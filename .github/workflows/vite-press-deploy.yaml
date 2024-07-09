@@ -1,0 +1,49 @@
+name: CI|CD 部署文档
+permissions:
+  contents: write
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: build vite press
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+
+    steps:
+      - name: 读取仓库内容 👓
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 设置 Node.js 🎶
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安装 yarn 🐸
+        run: npm install --global yarn
+
+      - name: 构建文档 🔨
+        env:
+          NODE_OPTIONS: --max_old_space_size=8192
+        run: |-
+          yarn install
+          yarn run docs:build
+          > docs/.vitepress/dist/.nojekyll
+
+      - name: 部署文档 👌
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: pages
+          folder: docs/.vitepress/dist
