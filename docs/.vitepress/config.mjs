@@ -30,8 +30,8 @@ export default defineConfig({
                 ]
             },
             {
-                text: "关于我 👩‍💻",
-                link: "/ABOUT",
+                text: "环境安装 ‍💻",
+                link: "/path-install",
             },
             {
                 text: "版本信息 😶‍🌫️",
@@ -53,8 +53,8 @@ export default defineConfig({
                 ]
             },
             {
-                text: "关于我 👩‍💻",
-                link: "/ABOUT",
+                text: "环境安装 ‍💻",
+                link: "/path-install",
             },
             {
                 text: "版本信息 😶‍🌫️",

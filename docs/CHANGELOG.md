@@ -1,3 +1,10 @@
+## v1.1.0 <Badge type="tip" text="^1.1.0" />
+
+- SpringBoot 相关介绍及基本操作 （启动、构建、打包等）
+- 多种方式创建 SpringBoot 项目
+- 搭建自己的 SpringBoot 模板项目
+- 初始 SpringBoot 中的依赖管理和自动配置
+
 ## V1.0.0 <Badge type="tip" text="^1.0.0" />
 
 - 项目框架完成
