@@ -1,3 +1,12 @@
+## v1.2.0 <Badge type="tip" text="^1.2.0" />
+
+- IOC 概述
+- 常见 IOC
+- 配置文件的读取
+- profile
+- di、scope
+- conditional di
+
 ## v1.1.0 <Badge type="tip" text="^1.1.0" />
 
 - SpringBoot 相关介绍及基本操作 （启动、构建、打包等）
