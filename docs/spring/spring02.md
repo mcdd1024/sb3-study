@@ -533,7 +533,133 @@ public class Demo04ConfigFileApplication {
 
 # 五、依赖注入
 
+Bean 之间相互依赖可以通过依赖注入【Dependency Injection, DI】功能将一个 Bean 注入到另一个 Bean 中使用。例如 Controller层调用 Service 层，Service 层调用 Dao 层。
 
+![未命名文件.png](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407102322961.png)
+
+Spring 中注入值一般有三种方式：
+
+- **@Autowired**：Spring 提供的注解，默认根据 type（根据类型进行匹配），也就是说会优先根据接口类型去匹配并注入 Bean （接口的实现类），当一个接口存在多个实现类的话，byType 这种方式就无法正确注入对象了，因为这个时候 Spring 会同时找到多个满足条件的选择，默认情况下它自己不知道选择哪一个，这个时候，注入方式会变为 byName（根据名称进行匹配），这个名称通常就是类名（首字母小写）。另外，如果 type 无法辨别注入对象时，也可以配合 @Qualifier 或 @Primary 注解来分辨注入类。
+- **@Resource**：JavaEE 提供的注解，默认根据 name 注入，如果不成功则按照 type 注入，name 属性解析为 bean 的名称，type属性解析为 bean 的类型，如果使用 name 属性，则使用 byName 的自动注入策略，而使用 type 属性时则使用 byType 自动注入策略，如果同时指定 name 和 type 属性（不建议这么做）则注入方式为 byType+byName。
+- **构造方法**：根据构造方法注入数据，原理与 @Autowired 相同，属性可以加 final 修饰，避免在业务中修改 Bean 的引用，增加安全性。
+
+> [!TIP]
+>
+> SpringBoot 官方推荐在业务中通过构造方法进行注入，在测试中通过 @Autowride 的方式进行注入，下面我们通过一个简单示例进行演示
+
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Account {
+    private int id;
+    private String name;
+    private Integer age;
+    private String email;
+}
+```
+
+```java
+public interface AccountMapper {
+    List<Account> list();
+}
+
+@Repository
+public class AccountMapperImpl implements AccountMapper {
+    @Override
+    public List<Account> list() {
+        return List.of(
+                new Account(1, "cbq", 22, "cbq@gmail.com"),
+                new Account(2, "cb", 18, "cb@qq.com"));
+    }
+}
+```
+
+```java
+public interface AccountService {
+    List<Account> list();
+}
+
+@Service
+@RequiredArgsConstructor // 由 lombok 提供可生成构造方法
+public class AccountServiceImpl implements AccountService {
+
+    private final AccountMapper mapper;
+
+    @Override
+    public List<Account> list() {
+        return mapper.list();
+    }
+}
+```
+
+```java
+@RestController
+@RequestMapping("api/v1/accounts")
+@RequiredArgsConstructor
+public class AccountController {
+
+    private final AccountService service;
+
+    @GetMapping
+    List<Account> list() {
+        return service.list();
+    }
+
+}
+```
+
+![image-20240710233622816](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407102336922.png)
+
+## 5.2 Bean 的作用域
+
+在 Spring 容器中，Bean 的作用域默认是单例的，可以通过 @Scope 注解设置，有 6 种作用域：
+
+- prototype：一个 bean 定义可以有多个 bean 实例。
+- singleton：（默认的）在每个 Spring IoC 容器中，一个 bean 定义对应只会有唯一的一个 bean 实例。
+- request：一个 bean 定义对应于单个 HTTP 请求的生命周期。也就是说，每个 HTTP 请求都有一个 bean 实例，且该实例仅在这个 HTTP 请求的生命周期里有效。该作用域仅适用于 WebApplicationContext 环境。
+- session：一个 bean 定义对应于单个 HTTP Session 的生命周期，也就是说，每个 HTTP Session 都有一个 bean 实例，且该实例仅在这个 HTTP Session 的生命周期里有效。该作用域仅适用于 WebApplicationContext 环境。
+- application：一个 bean 定义对应于单个 ServletContext 的生命周期。该作用域仅适用于 WebApplicationContext 环境。
+- websocket【这个作用范围没有找到在哪声明】：一个 bean 定义对应于单个 websocket 的生命周期。该作用域仅适用于WebApplicationContext 环境。
+
+```java
+@Scope(value = "prototype")
+@Component
+public class Cat {
+}
+
+@Scope(value = "singleton")
+@Component
+public class Dog {
+}
+```
+
+```java
+@SpringBootApplication
+@Slf4j
+public class Demo05DependencyInjectionApplication {
+    public static void main(String[] args) {
+        ApplicationContext context = SpringApplication.run(Demo05DependencyInjectionApplication.class, args);
+
+        Cat cat1 = context.getBean(Cat.class);
+        Cat cat2 = context.getBean(Cat.class);
+
+        System.out.println("cat1 = " + cat1);
+        System.out.println("dog2 = " + cat2);
+
+        Dog dog1 = context.getBean(Dog.class);
+        Dog dog2 = context.getBean(Dog.class);
+
+        System.out.println("dog1 = " + dog1);
+        System.out.println("dog2 = " + dog2);
+
+
+        log.info("Demo05DependencyInjectionApplication run successful ");
+    }
+}
+```
+
+![image-20240710234620782](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407102346052.png)
 
 # 六、条件装配
 
