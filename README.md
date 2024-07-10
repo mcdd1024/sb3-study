@@ -2,7 +2,7 @@
 
 SpringBoot3 学习项目参考自 B站 UP 石添的编程哲学
 
-> [!TIP] Links：
+> [!TIP]
 > - [视频地址](https://www.bilibili.com/video/BV16H4y1F7wa/?p=1&vd_source=9071a50b607525e6db8ba7b49bc960f5)
 > - [文档地址](https://www.yuque.com/shitiantian-my2mt/uu4rgv/fvmuzygdqp64vfd0)
 > - [gitee 仓库地址](https://gitee.com/stt0626/stt-study)

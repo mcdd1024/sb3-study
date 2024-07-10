@@ -24,8 +24,8 @@ export default {
         const members = [
             {
                 avatar: 'https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/avatar.png',
-                name: 'cbq1029',
-                title: 'Creator',
+                name: 'mcdd1024',
+                title: 'coder',
                 links: [
                     {icon: 'github', link: 'https://github.com/caobaoqi1029'},
                     {
