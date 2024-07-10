@@ -543,6 +543,8 @@ Spring 中注入值一般有三种方式：
 - **@Resource**：JavaEE 提供的注解，默认根据 name 注入，如果不成功则按照 type 注入，name 属性解析为 bean 的名称，type属性解析为 bean 的类型，如果使用 name 属性，则使用 byName 的自动注入策略，而使用 type 属性时则使用 byType 自动注入策略，如果同时指定 name 和 type 属性（不建议这么做）则注入方式为 byType+byName。
 - **构造方法**：根据构造方法注入数据，原理与 @Autowired 相同，属性可以加 final 修饰，避免在业务中修改 Bean 的引用，增加安全性。
 
+## 5.1 demo
+
 > [!TIP]
 >
 > SpringBoot 官方推荐在业务中通过构造方法进行注入，在测试中通过 @Autowride 的方式进行注入，下面我们通过一个简单示例进行演示
