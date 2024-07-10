@@ -537,5 +537,82 @@ public class Demo04ConfigFileApplication {
 
 # 六、条件装配
 
+条件装配就是在满足相应条件的时候再装载对应的 Bean，比如连接数据库时当数据源存在的时候再加载连接数据库的 Bean，条件装配可以使用 @Conditional 和其派生注解实现
 
+![image-20240710231927102](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407102319428.png)
 
+我们可以通过下面的小栗子体验一下，下面的 DataSourceConfiguration 中 dateCollectionService() 方法被 @ConditionalOnBean(DataSource.class) 标记，即如果 存在 DataSource这样的 bean 才装配 DataCollectionService
+
+```java
+@Data
+public class DataSource {
+
+    private String driverClassName;
+    private String url;
+    private String username;
+    private String password;
+
+}
+```
+
+```java
+@Data
+public class DataCollectionService {
+
+    private DataSource dataSource;
+
+    public void collect() {
+        String url = dataSource.getUrl();
+        String driverClassName = dataSource.getDriverClassName();
+        System.out.println("连接数据库 ======> ");
+        System.out.println("url ====>" + url);
+        System.out.println("driverClassName ===>》" + driverClassName);
+    }
+}
+```
+
+```java
+@Configuration
+public class DataSourceConfiguration {
+
+    @Bean
+    public DataSource dataSource() {
+        DataSource dataSource = new DataSource();
+        dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://localhost:3306");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+        return dataSource;
+    }
+
+    @Bean
+    // 当 DataSource 这个 bean 存在时加载
+    @ConditionalOnBean(DataSource.class)
+    public DataCollectionService dateCollectionService() {
+        DataCollectionService dateCollectionService = new DataCollectionService();
+        System.out.println("dataSource() ====> " + dataSource());
+        dateCollectionService.setDataSource(dataSource());
+        return dateCollectionService;
+    }
+
+}
+```
+
+```java
+@SpringBootApplication
+@Slf4j
+public class Demo06ConditionalDiApplication {
+    public static void main(String[] args) {
+        ApplicationContext context = SpringApplication.run(Demo06ConditionalDiApplication.class, args);
+
+        DataCollectionService service = context.getBean(DataCollectionService.class);
+
+        System.out.println("service = " + service);
+        service.collect();
+
+        log.info("Demo06ConditionalDiApplication run successful ");
+    }
+}
+```
+
+![image-20240710231824248](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407102318590.png)
