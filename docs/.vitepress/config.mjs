@@ -30,8 +30,10 @@ export default defineConfig({
                 ]
             },
             {
-                text: "环境安装 ‍💻",
-                link: "/path-install",
+                text: "工具 🔨",
+                items: [
+                    {text: '💻 环境安装', link: '/tools/path-install.md'},
+                ]
             },
             {
                 text: "版本信息 😶‍🌫️",
@@ -53,8 +55,12 @@ export default defineConfig({
                 ]
             },
             {
-                text: "环境安装 ‍💻",
-                link: "/path-install",
+                text: "工具 🔨",
+                link: '/tools/index.md',
+                collapsed: false,
+                items: [
+                    {text: '💻 环境安装', link: '/tools/path-install.md'},
+                ]
             },
             {
                 text: "版本信息 😶‍🌫️",

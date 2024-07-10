@@ -1,7 +1,7 @@
 # 开篇
 
 > [!CAUTION] 前置准备：
-> 可参考 [环境安装](../path-install.md) 进行准备 （Windows）
+> 可参考 [环境安装](../tools/path-install.md) 进行准备 （Windows）
 > - IDEA
 > - JAVA、Maven、MySQL
 > - Git (版本控制)
