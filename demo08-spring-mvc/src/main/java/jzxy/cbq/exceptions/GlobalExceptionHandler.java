@@ -3,6 +3,7 @@ package jzxy.cbq.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import jzxy.cbq.entity.CommonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -38,6 +39,16 @@ public class GlobalExceptionHandler {
     public CommonResult handleServiceException(Exception e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址 '{}',发生业务异常. ", requestURI, e);
+        return CommonResult.error(e.getMessage());
+    }
+
+    /**
+     * 参数校验异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public CommonResult handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址 '{}',参数校验错误. ", requestURI, e);
         return CommonResult.error(e.getMessage());
     }
 }

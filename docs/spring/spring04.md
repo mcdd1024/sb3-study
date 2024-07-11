@@ -885,36 +885,495 @@ public final class ServiceException extends RuntimeException {
 
 ## 2.5 参数校验
 
-在后端服务接收数据时为了保障接口安全和过滤无效请求通常会对参数进行校验，符合接口参数规则再处理，否则直接拦截返回不做处理，SpringBoot中处理参数校验分三步走：
+在后端服务接收数据时为了保障接口安全和过滤无效请求通常会对参数进行校验，符合接口参数规则再处理，否则直接拦截返回不做处理，SpringBoot 中处理参数校验分三步走：
 
 - 引入参数校验依赖
 - 定义参数校验规则
 - 启用参数校验
 
+1. 引入依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+</dependency>
+```
+
+主要其实是引入 **hibernate-validator** 这个依赖
+
+![image-20240711164711444](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111647407.png)
+
+2. 定义参数校验规则
+
+此处以实体类接收数据为例，在 Student 类中定义规则
+
+```java
+@Data
+public class Student {
+    @NotNull(message = "id 不能为空")
+    private Integer id;
+    @Length(min = 2, max = 8, message = "姓名长度为 2-8")
+    private String name;
+    @Min(value = 0, message = "年龄最小为 0")
+    @Max(value = 200, message = "年龄最大为 200")
+    private Integer age;
+    @NotEmpty(message = "姓名不能为空")
+    @Email(message = "邮箱格式不正确")
+    private String email;
+    @Pattern(regexp = "(^\\\\d{15}$)|(^\\\\d{17}([0-9]|X)$)",message = "身份证格式错误")
+    private String idCard;
+}
+```
+
+3. 启用参数校验
+
+```java
+@RequestMapping("students")
+@RestController
+@Slf4j
+public class StudentController {
+
+    @PostMapping
+    public CommonResult add(@RequestBody @Validated Student student) {
+        return CommonResult.success("添加成功 student is -->", student);
+    }
+
+    @GetMapping("/{id}")
+    public CommonResult findById(@PathVariable("id") @Min(value = 1,message = "id 最小为 0") Integer id) {
+        return CommonResult.success("查找成功 id is -->", id);
+    }
+}
+```
+
+![image-20240711171955312](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111719616.png)
+
 ## 2.6 文件上传
 
+SpringMVC 提供的文件上传通过 **MultipartHttpServletRequest** 实现，以下是该接口的体系结构
 
+![image.png](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111812942.png)
+
+> [!NOTE]
+>
+> 文件上传分为单文件上传和批量文件上传，值得注意的是文件上传不能使用 GET 请求，因为文件通常比较大，数据放到 request body中，通常会 **使用POST请求** 实现文件上传，使用 **MultipartFile** 接受文件数据
+
+```java
+@RequestMapping("local-files")
+@RestController
+@Slf4j
+public class LocalFileController {
+
+    @PostMapping("single-file")
+    public CommonResult singleFile(@RequestParam("file") MultipartFile file) {
+        showInfo(file);
+        return CommonResult.success();
+    }
+
+    /**
+     * 多文件上传
+     */
+    @PostMapping("method2")
+    public CommonResult method2(@RequestParam("fileList") MultipartFile[] fileList) {
+        for (MultipartFile file : fileList) {
+            showInfo(file);
+            log.info("============================");
+        }
+
+        return CommonResult.success();
+    }
+
+    private static void showInfo(MultipartFile file) {
+        log.info("文件大小 ==========> {}", file.getSize());
+        log.info("文件文件名 ==========> {}", file.getName());
+        log.info("文件文本类型 ==========> {}", file.getContentType());
+        log.info("文件原始名 ==========> {}", file.getOriginalFilename());
+    }
+}
+```
+
+文件上传时默认请求最大数据量为10M
+
+![image-20240711181917119](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111819126.png)
+
+可以通过修改配置文件设置上传文件大小和请求数据大小
+
+- 单文件大小：一个文件的最大大小
+- 请求文件大小：整个请求的最大大小
+
+比如以下案例一个文件最大是 200MB，请求最多是 400MB，也就是一个文件不要超过 200M，上传多个文件一共不能超过 400M，也就是 200MB 的文件能上传 2 个，100MB 的文件能上传 4 个
+
+```yaml
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB # 设置单文件大小
+      max-request-size: 400MB # 设置请求文件大小
+```
+
+![image-20240711181959253](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111820365.png)
 
 ### 2.6.1 上传至本地
 
+文件上传到本地有以下几个步骤：
 
+- 配置文件中指定文件上传目录，指定文件访问路径
+- 开发文件上传工具类，没有目录创建目录，重置文件名称，上传文件
+- 返回文件名字和文件访问路径
+
+> [!TIP]
+>
+> 这里我们使用 [Hutool 工具](https://www.hutool.cn/docs/#/?id=%f0%9f%93%a6%e5%ae%89%e8%a3%85)
+>
+> ```xml
+>         <dependency>
+>             <groupId>cn.hutool</groupId>
+>             <artifactId>hutool-all</artifactId>
+>             <version>5.8.16</version>
+>         </dependency>
+> ```
+
+```yaml
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB # 设置单文件大小
+      max-request-size: 400MB # 设置请求文件大小
+  mvc:
+    static-path-pattern: /file/** # 配置静态资源访问前缀
+  web:
+    resources:
+      static-locations: file:D:/dev-tools/file-up # 设置静态资源映射路径
+cbq:
+  upload_path: D:/dev-tools/file-up # 自定义配置，文件上传路径
+
+```
+
+```java
+@Slf4j
+@Component
+public class FileUploadUtils {
+    // 使用静态属性，通过 set 方法注入值，类上需要加 @Component 注解才能完成值注入
+    private static String uploadPath;
+
+    @Value("${cbq.upload_path}")
+    public void setUploadPath(String uploadPath) {
+        FileUploadUtils.uploadPath = uploadPath;
+    }
+
+    /**
+     * 文件上传
+     */
+    public static final String upload(MultipartFile file)
+            throws IOException {
+
+        String fileName = extractFilename(file);
+        String absPath = getAbsoluteFile(fileName).getAbsolutePath();
+        file.transferTo(Paths.get(absPath));
+        return fileName;
+    }
+
+    /**
+     * 编码文件名
+     */
+    public static final String extractFilename(MultipartFile file) {
+        return StrUtil.format("{}.{}", UUID.randomUUID().toString(), getExtension(file));
+    }
+
+    public static final File getAbsoluteFile(String fileName) throws IOException {
+        File desc = new File(uploadPath + File.separator + fileName);
+        if (!desc.exists()) {
+            if (!desc.getParentFile().exists()) {
+                desc.getParentFile().mkdirs();
+            }
+        }
+        return desc;
+    }
+
+    /**
+     * 获取文件名的后缀
+     */
+    public static final String getExtension(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+
+        return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+    }
+}
+```
+
+```java
+    @PostMapping("/s_upload")
+    public CommonResult uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            // 上传并返回新文件名称
+            String fileName = FileUploadUtils.upload(file);
+            HashMap<String, String> map = new HashMap<>();
+            // 返回值根据需求返回就可以了
+            map.put("fileName", fileName);
+            map.put("url", "http://localhost:8080/file/" + fileName);
+            return CommonResult.success(map);
+        } catch (Exception e) {
+            return CommonResult.error(e.getMessage());
+        }
+    }
+```
+
+![image-20240711183326669](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111833820.png)
+
+![image-20240711183303295](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111833345.png)
 
 ### 2.6.2 上传至阿里云 OSS
+
+文件还可以上传到其他服务商提供的文件存储平台上，比如七牛云、阿里云、华为云、腾讯云等，好处在于这些平台提供了高可用的文件存储能力，支持断点续传，大文件分片上传等功能，弊端在于收费，至于平台的稳定性选择大厂家都要比自己的稳吧！
+
+这里选用阿里云 OSS 服务存储文件，步骤基本如下：
+
+- 需要有阿里云账号，可以通过手机号注册，实名认证一下就可以了，企业的话使用营业执照做企业认证可以有更多优惠
+- 开启阿里云 OSS 服务，创建子账号操作服务
+- 创建文件存储空间，阿里云中一个存储空间称为一个 bucket
+- 导入依赖，开发功能
+
+> [!TIP]
+>
+> 注册账号这块就省略了到官网自己注册就行，官网地址：https://www.aliyun.com/
+
+1. 开启阿里云服务
+
+TODO
+
+2. 引入阿里云 OSS 依赖
+
+```xml
+<dependency>
+    <groupId>com.aliyun.oss</groupId>
+    <artifactId>aliyun-sdk-oss</artifactId>
+    <version>3.15.1</version>
+</dependency>
+```
+
+如果使用的是 Java 9 及以上的版本，则需要添加 JAXB 相关依赖。添加 JAXB 相关依赖示例代码如下：
+
+```xml
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.1</version>
+</dependency>
+<dependency>
+    <groupId>javax.activation</groupId>
+    <artifactId>activation</artifactId>
+    <version>1.1.1</version>
+</dependency>
+<!-- no more than 2.3.3-->
+<dependency>
+    <groupId>org.glassfish.jaxb</groupId>
+    <artifactId>jaxb-runtime</artifactId>
+    <version>2.3.3</version>
+</dependency>
+```
+
+3. 上传文件
+
+```java
+@Slf4j
+public class OSSUploadUtils {
+    public static String uploadOSS(MultipartFile file) {
+        // Endpoint 以华东 1（杭州）为例，其它 Region 请按实际情况填写。
+        String endpoint = "https://oss-cn-beijing.aliyuncs.com";
+        String keyId = "换成自己的 key";
+        String keySecret = "换成自己的 key";
+        // 填写 Bucket 名称，例如 example bucket
+        String bucketName = "stt-study";
+        // 设置文件名
+        String fileName = extractFilename(file);
+
+        // 创建 OSSClient 实例
+        OSS ossClient = new OSSClientBuilder().build(endpoint, keyId, keySecret);
+
+        try {
+            // 创建 PutObjectRequest 对象
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName, file.getInputStream());
+
+            // 上传文件
+            PutObjectResult result = ossClient.putObject(putObjectRequest);
+            log.info("result======>{}", result);
+            return fileName;
+        } catch (OSSException oe) {
+            log.info("OSSException===》{}", oe.getMessage());
+            throw new ServiceException("文件上传失败");
+        } catch (ClientException ce) {
+            log.info("ClientException===》{}", ce.getMessage());
+            throw new ServiceException("文件上传失败");
+        } catch (IOException e) {
+            log.info("IOException===》{}", e.getMessage());
+            throw new ServiceException("文件上传失败");
+        } finally {
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
+        }
+    }
+}
+```
 
 
 
 # 三、拦截器
 
+当请求来到 DispatcherServlet 时， 它会根据 HandlerMapping 的机制找到处理器这样就会返回一个 HandlerExecutionChain 对象，这个对象包含处理器和拦截器。这里的拦截器会对处理器进行拦截，通过拦截器增强处理器的功能。
+
+拦截器（Interceptor）是一种特殊的组件，它可以在请求处理的过程中对请求和响应进行拦截和处理。拦截器可以在请求到达目标处理器之前、处理器处理请求之后以及视图渲染之前执行特定的操作。拦截器的主要目的是在不修改原有代码的情况下，实现对请求和响应的统一处理。
+
+拦截器可以用于实现以下功能：
+
+1. 权限控制：拦截器可以在请求到达处理器之前进行权限验证，从而实现对不同用户的访问控制
+2. 日志记录：拦截器可以在请求处理过程中记录请求和响应的详细信息，便于后期分析和调试
+3. 接口幂等性校验：拦截器可以在请求到达处理器之前进行幂等性校验，防止重复提交
+4. 数据校验：拦截器可以在请求到达处理器之前对请求数据进行校验，确保数据的合法性
+5. 缓存处理：拦截器可以在请求处理之后对响应数据进行缓存，提高系统性能
+
 ## 3.1 拦截器与过滤器的区别
 
+拦截器和过滤器都可以实现对请求和响应的拦截和处理，但它们之间存在以下区别：
 
+1. 执行顺序：过滤器在拦截器之前执行，拦截器在处理器之前执行
+2. 功能范围：过滤器可以对所有请求进行拦截，而拦截器只能对特定的请求进行拦截
+3. 生命周期：过滤器由 Servlet 容器管理，拦截器由 Spring 容器管理
+4. 使用场景：过滤器适用于对请求和响应的全局处理，拦截器适用于对特定请求的处理
 
 ## 3.2 拦截器实现
 
+所有的拦截器都应实现 HandlerInterceptor 接口，该接口实现如下：
 
+```java
+public interface HandlerInterceptor {
 
-## 3.3 多拦截器
+	/**
+    在请求到达处理器之前执行，可以用于权限验证、数据校验等操作。
+    如果返回 true，则继续执行后续操作；如果返回 false，则中断请求处理
+	 */
+	default boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+			throws Exception {
 
+		return true;
+	}
 
+	// 在处理器处理请求之后执行，可以用于日志记录、缓存处理等操作
+	default void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable ModelAndView modelAndView) throws Exception {
+	}
 
-## 3.4 拦截器的性能优化和常见问题
+	// 在视图渲染之后执行，可以用于资源清理等操作
+	default void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
+			@Nullable Exception ex) throws Exception {
+	}
+
+}
+```
+
+## 3.3 自定义拦截器
+
+```java
+@Slf4j
+public class DemoInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("preHandle 执行");
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        log.info("postHandle 执行");
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        log.info("afterCompletion 执行");
+    }
+}
+```
+
+新建类实现 WebMvcConfigurer 接口，类上使用 @Configuration 注解，重写 addInterceptors 方法配置自定义的拦截器
+
+```java
+@Configuration
+public class WebConfiguration implements WebMvcConfigurer {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new DemoInterceptor())
+                .addPathPatterns("/**") // 设置匹配路径
+                .excludePathPatterns("/params/method1"); // 设置忽略路径
+    }
+}
+```
+
+![image-20240711184421091](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111844645.png)
+
+![image-20240711184444152](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111844477.png)
+
+## 3.4 多拦截器
+
+再定义一个控制接口幂等的拦截器，意思就是不可重复点击，实现思路:
+
+- 进入接口之前判断是否正在访问，可以将是否正在访问的状态记录到 Map 中，项目中建议使用 redis 记录
+- 访问接口之后将这个状态移除，案例中我们就没有移除，因为此处使用的 Map 不是项目共享的
+
+```java
+@Slf4j
+public class IdempotentInterceptor implements HandlerInterceptor {
+    Map<String, String> map = new HashMap<>();
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String token = request.getHeader("token");
+        String requestURI = request.getRequestURI();
+        log.info("token ====> {}", token);
+        log.info("requestURI ====> {}", requestURI);
+        if (map.get(token + requestURI) == null) {
+            map.put(token + requestURI, token);
+            return true;
+        }
+        log.info("接口已访问过");
+        return false;
+    }
+}
+```
+
+```java
+@Configuration
+public class WebConfiguration implements WebMvcConfigurer {
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new DemoInterceptor())
+                .addPathPatterns("/**") // 设置匹配路径
+                .excludePathPatterns("/params/method1"); // 设置忽略路径
+        registry.addInterceptor(new IdempotentInterceptor()).addPathPatterns("/**"); // 注册幂等拦截器 [!code ++]
+
+    }
+}
+```
+
+> [!TIP]
+>
+> 执行时拦截器执行顺序按照注册顺序
+
+![image-20240711185017945](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407111850301.png)
+
+## 3.5 拦截器的性能优化和常见问题
+
+拦截器在请求处理过程中可能会影响系统性能，以下是一些性能优化策略：
+
+1. 减少拦截器数量：尽量将相关功能集中到一个拦截器中，避免创建过多的拦截器
+2. 精确配置拦截规则：通过 addPathPatterns 和 excludePathPatterns 方法精确配置拦截规则，避免不必要的拦截
+3. 使用异步处理：在拦截器中使用异步处理，避免阻塞请求处理过程
+4. 使用缓存：在拦截器中使用缓存，减少对数据库或其他资源的访问
+
+拦截器是一种用于处理请求和响应的中间件，它可以在请求到达目标处理器之前或响应返回客户端之前执行一些操作。然而，在实际使用过程中，我们可能会遇到一些问题，如拦截器不生效、执行顺序错误或影响性能等。接下来，我们将逐一分析这些问题的原因及解决方法。
+
+1. 拦截器不生效：拦截器不生效的可能原因有很多，其中最常见的包括拦截器未注册到 InterceptorRegistry、拦截规则配置错误等。为了解决这个问题，我们需要首先检查拦截器是否已经正确注册到 InterceptorRegistry 中，然后再检查拦截规则是否配置正确。如果发现问题，需要及时进行调整和修复
+2. 拦截器执行顺序错误：拦截器执行顺序错误的主要原因是拦截器的注册顺序错误。在实际应用中，拦截器的执行顺序是根据它们在InterceptorRegistry 中的注册顺序来决定的。因此，为了解决这个问题，我们需要调整拦截器在 InterceptorRegistry 中的注册顺序，确保它们按照预期的顺序执行
+3. 拦截器影响性能：拦截器影响性能的主要原因是拦截器中的处理逻辑过于复杂或资源消耗过大。为了解决这个问题，我们需要对拦截器的处理逻辑进行优化，尽量减少不必要的计算和资源消耗。同时，我们还可以考虑使用一些性能监控工具，如 JProfiler 等，来对拦截器的性能进行实时监控和分析，从而找到性能瓶颈并进行优化
+
+拦截器在实际应用中可能会遇到一些问题，但只要我们能够深入了解其原理和机制，就可以找到合适的解决方案。

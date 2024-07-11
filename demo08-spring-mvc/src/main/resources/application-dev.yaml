@@ -1,0 +1,12 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB # 设置单文件大小
+      max-request-size: 400MB # 设置请求文件大小
+  mvc:
+    static-path-pattern: /file/** # 配置静态资源访问前缀
+  web:
+    resources:
+      static-locations: file:D:/dev-tools/file-up # 设置静态资源映射路径
+cbq:
+  upload_path: D:/dev-tools/file-up # 自定义配置，文件上传路径
