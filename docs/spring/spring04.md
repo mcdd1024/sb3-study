@@ -1349,7 +1349,7 @@ public class WebConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(new DemoInterceptor())
                 .addPathPatterns("/**") // 设置匹配路径
                 .excludePathPatterns("/params/method1"); // 设置忽略路径
-        registry.addInterceptor(new IdempotentInterceptor()).addPathPatterns("/**"); // 注册幂等拦截器 [!code ++]
+        registry.addInterceptor(new IdempotentInterceptor()).addPathPatterns("/**"); // [!code ++] 注册幂等拦截器 
 
     }
 }
@@ -1363,12 +1363,16 @@ public class WebConfiguration implements WebMvcConfigurer {
 
 ## 3.5 拦截器的性能优化和常见问题
 
+### 3.5.1 性能优化
+
 拦截器在请求处理过程中可能会影响系统性能，以下是一些性能优化策略：
 
 1. 减少拦截器数量：尽量将相关功能集中到一个拦截器中，避免创建过多的拦截器
 2. 精确配置拦截规则：通过 addPathPatterns 和 excludePathPatterns 方法精确配置拦截规则，避免不必要的拦截
 3. 使用异步处理：在拦截器中使用异步处理，避免阻塞请求处理过程
 4. 使用缓存：在拦截器中使用缓存，减少对数据库或其他资源的访问
+
+### 3.5.2 常见问题及排错方式
 
 拦截器是一种用于处理请求和响应的中间件，它可以在请求到达目标处理器之前或响应返回客户端之前执行一些操作。然而，在实际使用过程中，我们可能会遇到一些问题，如拦截器不生效、执行顺序错误或影响性能等。接下来，我们将逐一分析这些问题的原因及解决方法。
 
