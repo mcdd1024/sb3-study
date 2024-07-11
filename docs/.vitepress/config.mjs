@@ -26,6 +26,10 @@ export default defineConfig({
                     {text: '🦆 夯实 AOP 编程', link: '/spring/spring03.md'},
                     {text: '🐔 Web 开发', link: '/spring/spring04.md'},
                     {text: '🐲 整合日志', link: '/spring/spring05.md'},
+                    {text: '❤️ Spring Boot 服务监控', link: '/spring/spring06.md'},
+                    {text: '🤬 集成 MybatisPlus', link: '/spring/spring07.md'},
+                    {text: '🤯 集成 Redis', link: '/spring/spring08.md'},
+                    {text: '🤠 集成 POI', link: '/spring/spring09.md'},
                     {text: '🥸 Index ', link: '/spring/index.md'},
                 ]
             },
@@ -52,6 +56,10 @@ export default defineConfig({
                     {text: '🦆 夯实 AOP 编程', link: '/spring/spring03.md'},
                     {text: '🐔 Web 开发', link: '/spring/spring04.md'},
                     {text: '🐲 整合日志', link: '/spring/spring05.md'},
+                    {text: '❤️ Spring Boot 服务监控', link: '/spring/spring06.md'},
+                    {text: '🤬 集成 MybatisPlus', link: '/spring/spring07.md'},
+                    {text: '🤯 集成 Redis', link: '/spring/spring08.md'},
+                    {text: '🤠 集成 POI', link: '/spring/spring09.md'},
                 ]
             },
             {
