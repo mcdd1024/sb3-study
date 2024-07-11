@@ -1,3 +1,9 @@
+## v1.4.0 <Badge type="tip" text="^1.4.0" />
+
+- 门面模式介绍
+- SpringBoot 日志结构
+- 日志的基本使用
+
 ## v1.3.0 <Badge type="tip" text="^1.3.0" />
 
 - AOP 编程思想及相关术语
