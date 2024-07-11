@@ -49,7 +49,7 @@ docker run -itd --name sb3-study-docs -p 80:80 ghcr.io/mcdd1024/sb3-study-docs:v
 
 ## 贡献 🤝
 
-欢迎贡献！请随时提交拉取请求。有关详细信息，请参阅 [贡献指南](https://github.com/mcdd1024/sb3-study/blob/main/docs/CONTRIBUTING.md)。
+欢迎贡献！请随时提交拉取请求。有关详细信息，请参阅 [贡献指南](https://github.com/mcdd1024/sb3-study/blob/main/CONTRIBUTING.md)。
 
 这个项目的存在感谢所有贡献者：
 
