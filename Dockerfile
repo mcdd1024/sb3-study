@@ -1,8 +1,8 @@
 FROM nginx
-LABEL authors="cbq2024"
+LABEL authors="cbq1024"
 
-COPY ./docs/.vitepress/dist ./usr/share/nginx/html/docs-template
+COPY ./docs/.vitepress/dist ./usr/share/nginx/html/sb3-study
 COPY config/nginx.conf ./etc/nginx/conf.conf
 COPY config/conf.d ./etc/nginx/conf.d
 
-EXPOSE 5173
+EXPOSE 80
