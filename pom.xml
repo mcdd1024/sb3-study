@@ -16,6 +16,7 @@
         <module>demo05-dependency-injection</module>
         <module>demo06-conditional-di</module>
         <module>demo07-spring-aop</module>
+        <module>demo08-spring-mvc</module>
     </modules>
     <packaging>pom</packaging>
 

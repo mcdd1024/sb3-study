@@ -1,0 +1,20 @@
+package jzxy.cbq;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * @author: cbq1024
+ * @description: Demo08SpringMvcApplication
+ * @since 2024/7/11 下午3:09
+ */
+@SpringBootApplication
+@Slf4j
+public class Demo08SpringMvcApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(Demo08SpringMvcApplication.class, args);
+
+        log.info("Demo08SpringMvcApplication run successful ");
+    }
+}
