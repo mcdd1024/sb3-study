@@ -15,6 +15,7 @@
         <module>demo04-config-file</module>
         <module>demo05-dependency-injection</module>
         <module>demo06-conditional-di</module>
+        <module>demo07-spring-aop</module>
     </modules>
     <packaging>pom</packaging>
 
