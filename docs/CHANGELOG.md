@@ -1,3 +1,8 @@
+## v1.5.0 <Badge type="tip" text="^1.5.0" />
+
+- docs Docker Image
+
+
 ## v1.4.0 <Badge type="tip" text="^1.4.0" />
 
 - 门面模式介绍
