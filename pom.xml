@@ -18,6 +18,11 @@
         <module>demo07-spring-aop</module>
         <module>demo08-spring-mvc</module>
         <module>demo09-log</module>
+        <module>demo10-actuator-server</module>
+        <module>demo10-actuator-client</module>
+        <module>demo11-mybatis-plus</module>
+        <module>demo12-redis</module>
+        <module>demo13-poi</module>
     </modules>
     <packaging>pom</packaging>
 
