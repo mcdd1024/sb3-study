@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数(最小是5秒钟)-->
+<configuration monitorInterval="30" status="INFO">
+    <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+    <!--8个级别从低到高为：All < Trace < Debug < Info < Warn < Error < Fatal < OFF-->
+
+    <!--Log4j 2 的 `PatternLayout` 支持的格式化配置项参数如下：
+        `%m`：输出日志消息。
+        `%p`：输出日志级别（或%-5level，-5表示左对齐并且固定输出5个字符，如果不足在右边补0）。
+        `%r`：输出自应用启动后的毫秒数。
+        `%c`：输出日志所属的类的全名。
+        `%C`：输出日志所属的类的简单名。
+        `%t`：输出当前线程名称。
+        `%n`：换行。
+        `%d{pattern}`：输出日志时间，其中 `{pattern}` 是日期格式化参数，用于指定日期格式。eg：%d{HH:mm:ss.SSS}表示输出到毫秒的时间
+        `%F`：输出产生日志记录的文件名。如Log4j2Test.java
+        `%L`：输出产生日志记录的行号。
+        `%M`：输出产生日志记录的方法名。
+        `%x`：输出线程的NDC（nested diagnostic context）。
+        `%X{key}`：输出MDC（mapped diagnostic context）中指定键的值。
+         %logger 输出日志记录的类的全名，因为Root Logger没有名称，所以没有输出。
+    这些是一些常用的格式化配置项参数，你可以根据自己的需求组合这些参数来定义自己的日志输出格式。
+    -->
+    <!--变量配置-->
+    <Properties>
+        <property name="LOG_PATTERN" value="%d{yyyy-MM-dd}[%d{HH:mm:ss,SSS}] %p [%t] %highlight{%c{1.}.%M(%L)}: %m%n"/>
+        <!--<property name="LOG_PATTERN" value="%d{yyyy-MM-dd}[%d{HH:mm:ss,SSS}] %p [Thread：%t] [Class：%F Method：%M() Row：%L]: %m%n" />-->
+        <!-- 定义日志存储的路径 当前项目根目录-->
+        <property name="FILE_PATH" value="./log"/>
+        <!--<property name="FILE_NAME" value="myProject" />-->
+    </Properties>
+
+    <!--<Appenders>：定义所有日志输出器-->
+    <!--此节点有三种常见的子节点：Console,RollingFile,File-->
+    <appenders>
+
+        <!--控制台日志输出器：target:SYSTEM_OUT或SYSTEM_ERR,一般只设置默认:SYSTEM_OUT-->
+        <console name="Console" target="SYSTEM_OUT">
+            <!--日志输出格式：默认为：%m%n,即只输出日志和换行-->
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <!--阈值过滤器：只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+        </console>
+
+        <!--        &lt;!&ndash;文件会打印出所有信息，这个log每次运行程序会自动清空，由append属性决定，适合临时测试用&ndash;&gt;-->
+        <!--        <File name="Filelog" fileName="${FILE_PATH}/test.log" append="false">-->
+        <!--            <PatternLayout pattern="${LOG_PATTERN}"/>-->
+        <!--        </File>-->
+
+        <!--        &lt;!&ndash; 这个会打印出所有的debug及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档&ndash;&gt;-->
+        <!--        <RollingFile name="RollingFileDebug"-->
+        <!--                     fileName="${FILE_PATH}/debug.log"-->
+        <!--                     filePattern="${FILE_PATH}/debug/DEBUG-%d{yyyy-MM-dd}_%i.log.gz">-->
+        <!--            &lt;!&ndash;阈值过滤器，只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）&ndash;&gt;-->
+        <!--            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>-->
+        <!--            <PatternLayout pattern="${LOG_PATTERN}"/>-->
+        <!--            &lt;!&ndash;指定滚动日志的策略，即指定新建日志文件的时机&ndash;&gt;-->
+        <!--            <Policies>-->
+        <!--                &lt;!&ndash;interval属性用来指定多久滚动一次，时间单位取决于<PatternLayout pattern>，modulate属性调整时间，true：0点为基准滚动，false：服务器启动时间开始滚动&ndash;&gt;-->
+        <!--                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>-->
+        <!--                <SizeBasedTriggeringPolicy size="100MB"/>-->
+        <!--            </Policies>-->
+        <!--            &lt;!&ndash; DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖&ndash;&gt;-->
+        <!--            &lt;!&ndash;            <DefaultRolloverStrategy max="15">&ndash;&gt;-->
+        <!--            <DefaultRolloverStrategy max="10">-->
+        <!--                &lt;!&ndash;删除5天之前的日志&ndash;&gt;-->
+        <!--                <Delete basePath="${FILE_PATH}" maxDepth="2">-->
+        <!--                    <IfFileName glob="*/*.log*"/>-->
+        <!--                    <IfLastModified age="1d"/>-->
+        <!--                </Delete>-->
+        <!--            </DefaultRolloverStrategy>-->
+        <!--        </RollingFile>-->
+
+
+        <!--滚动文件日志输出器-->
+        <!--打印出所有的info及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileInfo"
+                     fileName="${FILE_PATH}/info.log"
+                     filePattern="${FILE_PATH}/info/INFO-%d{yyyy-MM-dd}_%i.log.gz">
+            <!--阈值过滤器，只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--interval属性用来指定多久滚动一次，时间单位取决于<PatternLayout pattern>，modulate属性调整时间，true：0点为基准滚动，false：服务器启动时间开始滚动-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <!--            <DefaultRolloverStrategy max="15">-->
+            <DefaultRolloverStrategy max="60">
+                <!--删除60天之前的日志-->
+                <Delete basePath="${FILE_PATH}" maxDepth="2">
+                    <IfFileName glob="*/*.log*"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+
+        <!--滚动文件日志输出器-->
+        <!--打印出所有的error及以上级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileError"
+                     fileName="${FILE_PATH}/error.log"
+                     filePattern="${FILE_PATH}/error/ERROR-%d{yyyy-MM-dd}_%i.log.gz">
+            <!--阈值过滤器：只输出level及其以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <!--interval属性用来指定多久滚动一次，时间单位取决于<PatternLayout pattern>，modulate属性调整时间，true：0点为基准滚动，false：服务器启动时间开始滚动-->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <!--<DefaultRolloverStrategy max="15">-->
+            <DefaultRolloverStrategy max="60">
+                <!--删除60天之前的日志-->
+                <Delete basePath="${FILE_PATH}" maxDepth="2">
+                    <IfFileName glob="*/*.log*"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!--异步日志处理器：阻塞队列最大容量为20000，超出队列容量时等待日志输出，包含位置信息-->
+        <Async name="Async" bufferSize="20000" blocking="true" includeLocation="true">
+            <AppenderRef ref="Console"/>
+            <!--<AppenderRef ref="RollingFileDebug"/>-->
+            <AppenderRef ref="RollingFileInfo"/>
+            <AppenderRef ref="RollingFileError"/>
+        </Async>
+    </appenders>
+
+    <!--<loggers>：定义日志记录器，只有定义了logger并引入的appender，日志输出器才会生效-->
+    <loggers>
+        <!--根日志记录器，设置级别为info-->
+        <root level="info">
+            <AppenderRef ref="Async"/>
+        </root>
+
+        <!--单独指定特定包下的class指定不同的日志级别-->
+        <!--日志记录器：过滤掉spring和mybatis的一些无用的DEBUG信息，级别设置为Info-->
+        <!--通过设置additivity="false"，日志消息将只被传递给当前日志记录器，而不会传递给父级记录器，避免日志消息被重复输出-->
+        <logger name="org.mybatis" level="info" additivity="false">
+            <AppenderRef ref="Async"/>
+        </logger>
+        <Logger name="org.springframework" level="info" additivity="false">
+            <AppenderRef ref="Async"/>
+        </Logger>
+        <logger name="org.mybatis.spring.SqlSessionUtils" level="OFF" additivity="false">
+            <AppenderRef ref="Async"/>
+        </logger>
+        <logger name="org.mybatis.spring.transaction.SpringManagedTransaction" level="OFF" additivity="false">
+            <AppenderRef ref="Async"/>
+        </logger>
+        <logger name="org.apache.kafka.clients" level="OFF" additivity="false">
+            <AppenderRef ref="Async"/>
+        </logger>
+        <logger name="org.apache.ibatis.logging.jdbc.BaseJdbcLogger" level="OFF" additivity="false">
+            <AppenderRef ref="Async"/>
+        </logger>
+    </loggers>
+
+</configuration>

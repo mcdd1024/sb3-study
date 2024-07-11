@@ -17,6 +17,7 @@
         <module>demo06-conditional-di</module>
         <module>demo07-spring-aop</module>
         <module>demo08-spring-mvc</module>
+        <module>demo09-log</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -30,6 +31,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

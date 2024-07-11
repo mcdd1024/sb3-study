@@ -1,0 +1,14 @@
+logging:
+  level:
+    jzxy.cbq.ShowInfo: debug # 调整指定包（类）的日志级别
+    root: info # 调整所有类的日志级别为 info
+  logback:
+    rolling policy:
+      # 日志文件保存方式
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+      # 单文件最大大小，超过就要切割
+      max-file-size: 1MB
+      # 启动时清除存档日志
+      clean-history-on-start: false
+      # 历史存档日志保存天数
+      max-history: 7

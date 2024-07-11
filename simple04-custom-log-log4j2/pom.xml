@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>jzxy.cbq</groupId>
-    <artifactId>simple03-created-by-maven</artifactId>
+    <artifactId>simple04-custom-log-log4j2</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -24,12 +24,28 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <!--     配出默认日志框架       -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--    引用 log4j2 框架    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
         <dependency>
@@ -37,13 +53,8 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>annotationProcessor</scope>
-        </dependency>
     </dependencies>
-
+    <!--插件配置-->
     <build>
         <plugins>
             <plugin>
