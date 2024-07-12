@@ -1,0 +1,18 @@
+spring:
+  boot:
+    admin:
+      client:
+        url: http://localhost:8090 # 客户端注册地址，与服务端 ip:port 一致
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    logfile: # 在线日志
+      external-file: D:\\spring.log
+  info:
+    env:
+      enabled: true
