@@ -103,7 +103,7 @@ management:
 
 ![image-20240712134629055](https://2024-cbq-1311841992.cos.ap-beijing.myqcloud.com/picgo/202407121346271.png)
 
-启动之后在浏览器输入 **http://服务端ip:服务端端口/applications** 即可查看服务列表，例如此处的 http://localhost:8090/applications
+启动之后在浏览器输入 **http://服务端ip:服务端端口/applications** 即可查看服务列表，例如此处的 `http://localhost:8090/applications`
 
 > [!CAUTION]
 >
