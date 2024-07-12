@@ -1,3 +1,8 @@
+## v1.6.0 <Badge type="tip" text="^1.6.0" />
+
+- 服务监控 服务端、客户端
+- Mybatis plus 逻辑删除
+
 ## v1.5.0 <Badge type="tip" text="^1.5.0" />
 
 - docs Docker Image
