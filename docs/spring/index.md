@@ -51,8 +51,11 @@
 ## [集成 MybatisPlus](./spring07.md)
 
 >[!NOTE] 主要包括：
-> - 基本 CRUD
-> - 逻辑删除
+>- MyBatis-Plus 快速使用
+>- 条件构造器
+>- 逻辑删除，主键生成策略，乐观锁插件
+>- 多表查询
+>- 多数据源
 
 ## [集成 Redis](./spring08.md)
 

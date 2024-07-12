@@ -1,0 +1,12 @@
+# 数据库配置
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybatis-plus?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:root}
+# mybatis-plus 配置
+mybatis-plus:
+  configuration:
+    # 配置输出 sql 到控制台
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
